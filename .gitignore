@@ -12,7 +12,7 @@ tests/results/
 tests/coverage.xml
 tests/integration/taskrun*/
 .coverage
-
+tests/example_filename*
 # Default ignored files
 /workspace.xml
 # Byte-compiled / optimized / DLL files
