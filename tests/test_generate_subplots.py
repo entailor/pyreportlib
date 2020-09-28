@@ -1,5 +1,5 @@
 from latexreport import make_document
-from latexreport.utils import generate_subplots
+from entailutils import generate_subplots
 import numpy as np
 
 plot_labels_tests = [['wind', 'wave', 'current'], list(range(0, 90, 45)),
