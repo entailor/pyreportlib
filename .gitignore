@@ -7,8 +7,6 @@ virt/
 .DS_Store
 config.yaml
 .dotenv
-tests/files/
-tests/results/
 tests/coverage.xml
 tests/integration/taskrun*/
 .coverage
