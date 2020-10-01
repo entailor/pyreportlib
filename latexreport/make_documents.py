@@ -20,6 +20,10 @@ import pandas as pd
 import numpy as np
 from latexreport import get_document
 from latexreport.utils import excel_to_latex
+from docx import Document
+from docx.shared import Cm
+from docx.oxml.shared import OxmlElement, qn
+import datetime
 
 
 class SidewaysFigure(Figure):
@@ -160,15 +164,39 @@ def _get_last_section(doc):
         if isinstance(stuff, (Section, Subsection, Subsubsection)):
             return stuff
 
+def _add_toc_to_docx(doc):
+    paragraph = doc.add_paragraph()
+    run = paragraph.add_run()
+    fldChar = OxmlElement('w:fldChar')  # creates a new element
+    fldChar.set(qn('w:fldCharType'), 'begin')  # sets attribute on element
+    instrText = OxmlElement('w:instrText')
+    instrText.set(qn('xml:space'), 'preserve')  # sets attribute on element
+    instrText.text = 'TOC \\o "1-3" \\h \\z \\u'  # change 1-3 depending on heading levels you need
 
-def _append2doc(doc, content):
+    fldChar2 = OxmlElement('w:fldChar')
+    fldChar2.set(qn('w:fldCharType'), 'separate')
+    fldChar3 = OxmlElement('w:t')
+    fldChar3.text = "Right-click to update field."
+    fldChar2.append(fldChar3)
+
+    fldChar4 = OxmlElement('w:fldChar')
+    fldChar4.set(qn('w:fldCharType'), 'end')
+
+    r_element = run._r
+    r_element.append(fldChar)
+    r_element.append(instrText)
+    r_element.append(fldChar2)
+    r_element.append(fldChar4)
+    p_element = paragraph._p
+
+def _append2latexdoc(doc, content):
     if isinstance(content, list):
         for item in content:
             if item.get('title'):
                 doc.append(_get_section(**item))
-                _append2doc(doc, item['content'])
+                _append2latexdoc(doc, item['content'])
             else:
-                _append2doc(doc, item)
+                _append2latexdoc(doc, item)
     else:
         section = _get_last_section(doc)
         if content.get('text'):
@@ -213,12 +241,114 @@ def _append2doc(doc, content):
             [doc.packages.append(Package(package)) for package in content['packages']]
 
 
-def make_document(document_title='Document title', document_filename='default_filename', content=[],
+def _append2worddoc(doc, content):
+    if isinstance(content, list):
+        for item in content:
+            if item.get('title'):
+                if item.get('level') == 1: # Add page break for level1-headings
+                    doc.add_page_break()
+                doc.add_heading(item.get('title'), level=item.get('level'))
+                _append2worddoc(doc, item.get('content'))
+            else:
+                _append2worddoc(doc, item)
+    else:
+        # if len(doc.sections)>0:
+        #     section = doc.sections[-1]
+        #     # TODO : LEter vi egentlgi etter heading her?
+
+        if content.get('text'):
+            if isinstance(content['text'], dict):
+                doc.add_paragraph(open(content['text']['filename']).read())
+            else:
+                doc.add_paragraph(content['text'])
+        if content.get('latex_code'):
+            print('Latex code not directly supported in word, ignored. ')
+    #         if isinstance(content['latex_code'], dict):
+    #             section.append(NoEscape(open(content['latex_code']['filename']).read()))
+    #         else:
+    #             section.append(NoEscape(content['latex_code']))
+        if content.get('table'):
+            for table in content['table']:
+                df = pd.read_excel(table['filename'], **table['kwargs'])
+
+                # add a table to the end and create a reference variable
+                # extra row is so we can add the header row
+                t = doc.add_table(df.shape[0] + 1, df.shape[1])
+                # t = doc.add_table(df.shape[0] + 1, df.shape[1], style='No Spacing')
+                # TODO : Add table style that is more compact
+
+                # add the header rows.
+                for j in range(df.shape[-1]):
+                    t.cell(0, j).text = df.columns[j]
+
+                # add the rest of the data frame
+                for i in range(df.shape[0]):
+                    for j in range(df.shape[-1]):
+                        t.cell(i + 1, j).text = str(df.round(decimals=5).values[i, j])
+                p = doc.add_paragraph()
+                r = p.add_run()
+                r.add_break()
+
+    #             section.append(NoEscape('\\begin{table}[H]'))  # note require float latex package for H command
+    #             section.append(NoEscape(pd.read_excel(table['filename'],
+    #                                                   **table['kwargs']).to_latex(longtable=True,
+    #                                                                               multicolumn_format='c')))
+    #             section.append(NoEscape('\\end{table}'))
+        if content.get('image'):
+            for image in content.get('image'):
+                doc.add_picture(image.get('filename'), width=Cm(12))
+                # TODO : Add caption (from here? : https://github.com/python-openxml/python-docx/issues/359 )
+        if content.get('subimage'):
+            print('The subfigure feature is not yet supported by the word compilator, figure is ignored')
+    #         figure = Figure(position='H')
+    #         for i, subimage in enumerate(content['subimage']):
+    #             subfigure = SubFigure(width=NoEscape(
+    #                 r'{}\linewidth'.format(np.round(1. / subimage.get('nr_horizontal_subimages', 2), 2) - 0.01)))
+    #             subfigure.add_image(subimage['filename'])
+    #             if subimage.get('caption', False):
+    #                 subfigure.add_caption(subimage['caption'])
+    #             if subimage.get('figure_caption', False) and i == 0:
+    #                 figure.add_caption(subimage['figure_caption'])
+    #             figure.append(subfigure)
+    #             if (i + 1) % subimage.get('nr_horizontal_subimages', 2) == 0 and i != 0 or subimage.get(
+    #                     'nr_horizontal_subimages', 2) == 1:
+    #                 section.append(figure)
+    #                 figure = Figure(arguments=NoEscape('\ContinuedFloat'), position='H')
+    #         section.append(figure)
+    #     if content.get('packages'):
+    #         [doc.packages.append(Package(package)) for package in content['packages']]
+
+
+# TODO : Endre navn til make_latex_document
+def make_latex_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
     doc = get_document(document_title, **doc_template_kwargs)
     content = _set_section_levels(content)
     content = _format_document_dict(content)
-    _append2doc(doc, content)
+    _append2latexdoc(doc, content)
     doc.generate_tex(document_filename)
     doc.generate_pdf(document_filename, clean_tex=False, clean=False, compiler='pdfLaTeX')
     return doc
+
+
+def make_word_document(document_title='Document title', document_filename='default_filename', content=[],
+                  **doc_template_kwargs):
+    doc = Document()
+    doc.core_properties.title = document_title
+    # doc.core_properties.project = 'Tailor report'
+    #
+    # doc.core_properties.Version = 'TestVersion 1.0'
+    #
+    # doc.core_properties.documentnumber = '123456-EN-AA'
+    # doc.core_properties.created = datetime.datetime.now().date()
+    # doc.core_properties.wf_name = 'WF ID NAME'
+    
+    
+    # TODO : Add front page
+    _add_toc_to_docx(doc)
+    content = _set_section_levels(content)
+    content = _format_document_dict(content)
+    _append2worddoc(doc, content)
+    doc.save(f'{document_filename}.docx')
+    return doc
+    # return content # For development

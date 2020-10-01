@@ -6,12 +6,15 @@ Created on Tue Aug 27 10:04:05 2019
 """
 
 import unittest
-from latexreport import make_document
+from latexreport import make_latex_document
 from latexreport.utils import excel_to_latex
 import latexreport.make_documents as md
 from pylatex import Document
 import json
+import os
 
+if not os.path.exists('results'):
+    os.makedirs('results')
 
 class TestLatexReport(unittest.TestCase):
     """Test sim2hdf5 and model2hdf5 functions.
@@ -28,7 +31,7 @@ class TestLatexReport(unittest.TestCase):
         headers = [[0, 1], 0, [0, 1], [0, 1, 2], [0, 1, 2]]
 
         for i, (testfile, document_filename, header) in enumerate(zip(self._excel_files, self._table_pdfs, headers)):
-            doc = make_document(document_title=f'test_excel_to_latex{i + 1}',
+            doc = make_latex_document(document_title=f'test_excel_to_latex{i + 1}',
                                 document_filename=document_filename,
                                 content=[{'title': 'Test',
                                           'content': excel_to_latex(testfile, header=header, index_col=0)}]
@@ -36,7 +39,7 @@ class TestLatexReport(unittest.TestCase):
             self.assertTrue(isinstance(doc, Document))
 
     def test_make_document(self):
-        doc = make_document(**json.load(open(self._make_document_dict_file)))
+        doc = make_latex_document(**json.load(open(self._make_document_dict_file)))
         self.assertTrue(isinstance(doc, Document))
 
     def test_format_document_dict(self):

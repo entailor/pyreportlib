@@ -8,12 +8,12 @@ def read(fname):
 setup(
     name='latexreport',
     version='0.1',
-    description='Latex report utilities',
+    description='pytailor report utilities',
     long_description=read('readme.MD'),
     url='http://www.entail.no',
     author='Entail AS',
     author_email='entail@entail.no',
     license='Proprietary',
-    keywords='orcaflex preprocessing postprocessing',
+    keywords='reporting preprocessing postprocessing',
     packages=find_packages(),
 )

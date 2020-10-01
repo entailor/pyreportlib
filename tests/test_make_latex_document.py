@@ -5,7 +5,7 @@ Created on Fri May 29 11:36:08 2020
 @author: bsorb
 """
 
-from latexreport import make_document
+from latexreport import make_latex_document
 
 files = {
     'plots': [f'files/plot_{i}.png' for i in range(4)],
@@ -47,4 +47,4 @@ make_document_dict = {
         ]
     }
 
-make_document(**make_document_dict)
+make_latex_document(**make_document_dict)

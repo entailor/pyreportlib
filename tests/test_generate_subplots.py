@@ -1,4 +1,4 @@
-from latexreport import make_document
+from latexreport import make_latex_document
 from entailutils import generate_subplots
 import numpy as np
 
@@ -47,7 +47,7 @@ for i, (plot_labels, plot_label_title,
                             'figure_caption': 'HsTpPlots',
                             'nr_horizontal_subimages': nrsub}}]
 
-    make_document(document_title=f'test_subplot_{i}',
+    make_latex_document(document_title=f'test_subplot_{i}',
                   document_filename=f'results/test_subplot_{i}',
                   content=[{'title': 'Parameters', 'content': report_content}]
                   )
