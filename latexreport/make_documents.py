@@ -333,7 +333,7 @@ def make_latex_document(document_title='Document title', document_filename='defa
 
 def make_word_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
-    doc = Document()
+    doc = Document('template.docx')
     doc.core_properties.title = document_title
     # doc.core_properties.project = 'Tailor report'
     #
@@ -344,8 +344,7 @@ def make_word_document(document_title='Document title', document_filename='defau
     # doc.core_properties.wf_name = 'WF ID NAME'
     
     
-    # TODO : Add front page
-    _add_toc_to_docx(doc)
+    # _add_toc_to_docx(doc)
     content = _set_section_levels(content)
     content = _format_document_dict(content)
     _append2worddoc(doc, content)
