@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "latexreport"
+name = "pyreportlib"
 version = "0.1.0"
 description = ""
 authors = ["Mads Fredrik Heiervang <mads@entail.no>"]
