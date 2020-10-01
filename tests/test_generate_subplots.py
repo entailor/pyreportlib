@@ -1,4 +1,4 @@
-from latexreport import make_latex_document
+from pyreportlib import make_latex_document
 from entailutils import generate_subplots
 import numpy as np
 

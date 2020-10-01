@@ -6,15 +6,16 @@ Created on Tue Aug 27 10:04:05 2019
 """
 
 import unittest
-from latexreport import make_latex_document
-from latexreport.utils import excel_to_latex
-import latexreport.make_documents as md
+from pyreportlib import make_latex_document, make_word_document
+from pyreportlib.utils import excel_to_latex
+import pyreportlib.make_documents as md
 from pylatex import Document
 import json
 import os
 
 if not os.path.exists('results'):
     os.makedirs('results')
+
 
 class TestLatexReport(unittest.TestCase):
     """Test sim2hdf5 and model2hdf5 functions.
@@ -38,9 +39,14 @@ class TestLatexReport(unittest.TestCase):
                                 )
             self.assertTrue(isinstance(doc, Document))
 
-    def test_make_document(self):
+    def test_make_latex_document(self):
         doc = make_latex_document(**json.load(open(self._make_document_dict_file)))
         self.assertTrue(isinstance(doc, Document))
+
+    def test_make_word_document(self):
+        document_dict = json.load(open(self._make_document_dict_file))
+        make_word_document(**document_dict)
+        self.assertTrue(os.path.isfile(document_dict["document_filename"]+".docx"))
 
     def test_format_document_dict(self):
         make_document_dict = json.load(open(self._make_document_dict_file))

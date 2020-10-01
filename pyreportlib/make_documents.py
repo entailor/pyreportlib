@@ -18,8 +18,8 @@ import posixpath
 from pylatex import Section, Subsection, Subsubsection, Package
 import pandas as pd
 import numpy as np
-from latexreport import get_document
-from latexreport.utils import excel_to_latex
+from pyreportlib import get_document
+from pyreportlib.utils import excel_to_latex
 from docx import Document
 from docx.shared import Cm
 from docx.oxml.shared import OxmlElement, qn
@@ -333,7 +333,7 @@ def make_latex_document(document_title='Document title', document_filename='defa
 
 def make_word_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
-    doc = Document('template.docx')
+    doc = Document()
     doc.core_properties.title = document_title
     # doc.core_properties.project = 'Tailor report'
     #

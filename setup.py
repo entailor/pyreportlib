@@ -6,7 +6,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name='latexreport',
+    name='pyreportlib',
     version='0.1',
     description='pytailor report utilities',
     long_description=read('readme.MD'),

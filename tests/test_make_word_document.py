@@ -5,7 +5,7 @@ Created on Fri May 29 11:36:08 2020
 @author: bsorb
 """
 
-from latexreport import make_word_document
+from pyreportlib import make_word_document
 
 
 
