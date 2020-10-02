@@ -1,0 +1,95 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Sep  2 10:06:22 2020
+
+@author: MadsFredrikHeiervang
+"""
+from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
+    StandAloneGraphic, MultiColumn, Tabu, LongTabu, LargeText, MediumText, \
+    LineBreak, NewPage, Tabularx, TextColor, simple_page_number, Command, \
+    Figure, Package, SubFigure
+from pylatex.utils import bold, NoEscape
+from pylatex.base_classes import CommandBase, Arguments
+import os
+
+_fig_ext = u'.pdf'
+
+
+class HyperrefCommand(CommandBase):
+    _latex_name = 'hypersetup'
+    packages = [Package('hyperref')]
+
+
+def get_document(document_title='Report', author='Entail AS', fig_ext=u'.pdf',
+                 header_logofilename='entail.pdf',
+                 logo_image_option_header="width=250px"):
+    global _fig_ext
+    _fig_ext = fig_ext
+
+    geometry_options = {
+        "head": "70pt",
+        "margin": "1.5cm",
+        "bottom": "1.5cm",
+        "includeheadfoot": True
+    }
+    document_options = ['a4paper']
+    doc = Document(geometry_options=geometry_options,
+                   document_options=document_options)
+
+    # packages
+    doc.packages.append(Package('booktabs'))
+    doc.packages.append(Package('chngcntr'))
+    doc.packages.append(Package('longtable'))
+    doc.packages.append(Package('titlepic'))
+    doc.packages.append(Package('float'))
+    # page style
+    first_page = PageStyle("firstpage")
+
+    # Header image
+    with first_page.create(Head("L")) as header_left:
+        with header_left.create(MiniPage(width=NoEscape(r"0.25\textwidth"),
+                                         pos='c')) as logo_wrapper:
+            logo_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                     header_logofilename).replace('\\', '/')
+            logo_wrapper.append(StandAloneGraphic(image_options="width=80px",
+                                                  filename=logo_file))
+
+    # Add document title
+    with first_page.create(Head("R")) as right_header:
+        with right_header.create(MiniPage(width=NoEscape(r"0.75\textwidth"),
+                                          pos='c', align='r')) as title_wrapper:
+            title_wrapper.append(LargeText(bold(document_title)))
+            title_wrapper.append(LineBreak())
+            title_wrapper.append(MediumText(bold(NoEscape(r'\today'))))
+
+    # Add footer
+    with first_page.create(Foot("C")) as center_footer:
+        center_footer.append(simple_page_number())
+    with first_page.create(Foot("R")) as right_footer:
+        with right_footer.create(MiniPage(width=NoEscape(r"0.15\textwidth"),
+                                          pos='r')) as logo_wrapper:
+            logo_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                     'tailor.png').replace('\\', '/')
+            logo_wrapper.append(StandAloneGraphic(image_options="width=50px",
+                                                  filename=logo_file))
+
+    doc.preamble.append(first_page)
+    doc.change_document_style("firstpage")
+    doc.preamble.append(Command('title', document_title))
+    logo_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             header_logofilename).replace('\\', '/')
+    doc.preamble.append(Command('titlepic', StandAloneGraphic(image_options=
+                                                              logo_image_option_header,
+                                                              filename=logo_file)))
+    # doc.preamble.append(Command('author', author))
+    doc.preamble.append(Command('date', NoEscape(r'\today')))
+    doc.preamble.append(
+        Command('hypersetup', arguments='colorlinks, citecolor=black, filecolor=black, linkcolor=black, urlcolor=black',
+                packages=[Package('hyperref')]))
+    doc.preamble.append(NoEscape(r'\counterwithin{figure}{section}'))
+    doc.append(NoEscape(r'\maketitle'))
+    doc.append(NewPage())
+    doc.append(Command('tableofcontents'))
+    doc.append(NewPage())
+
+    return doc
