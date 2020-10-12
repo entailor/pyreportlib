@@ -328,6 +328,7 @@ def make_latex_document(document_title='Document title', document_filename='defa
     _append2latexdoc(doc, content)
     doc.generate_tex(document_filename)
     doc.generate_pdf(document_filename, clean_tex=False, clean=False, compiler='pdfLaTeX')
+    doc.generate_pdf(document_filename, clean_tex=False, clean=True, compiler='pdfLaTeX')
     return doc
 
 
@@ -342,8 +343,8 @@ def make_word_document(document_title='Document title', document_filename='defau
     # doc.core_properties.documentnumber = '123456-EN-AA'
     # doc.core_properties.created = datetime.datetime.now().date()
     # doc.core_properties.wf_name = 'WF ID NAME'
-    
-    
+
+
     # _add_toc_to_docx(doc)
     content = _set_section_levels(content)
     content = _format_document_dict(content)
