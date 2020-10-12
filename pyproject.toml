@@ -2,15 +2,24 @@
 name = "pyreportlib"
 version = "0.1.0"
 description = ""
+<<<<<<< HEAD
 authors = ["Mads Fredrik Heiervang <mads@entail.no>"]
+=======
+authors = ["bernt sørby <bsorby@gmail.com>"]
+>>>>>>> 00754f7575f3756dc5e29238ced0c7f72de4ba1b
 
 [tool.poetry.dependencies]
 python = "^3.8"
 pylatex = "^1.4.0"
 pandas = "^1.1.2"
+<<<<<<< HEAD
 matplotlib = "^3.3.2"
 xlrd = "^1.2.0"
 python-docx = "^0.8.10"
+=======
+python-docx = "^0.8.10"
+xlrd = "^1.2.0"
+>>>>>>> 00754f7575f3756dc5e29238ced0c7f72de4ba1b
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
