@@ -24,7 +24,7 @@ make_document_dict = {
         'fig_ext': u'.pdf',
         'header_logofilename': 'entail.pdf',
         'logo_image_option_header': "width=250px",
-        'document_template' : files['word_template'],
+        # 'document_template' : files['word_template'],
         'workflow_ID' : 1234,
         'content': [
             {'title': 'Summary', 'content': [
