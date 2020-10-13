@@ -44,15 +44,17 @@ def _set_section_levels(content):
                 if sub_item.get('content'):
                     sub_item['level'] = 2
                     for sub_sub_item in sub_item['content']:
-                        if sub_sub_item.get('content'):
-                            sub_sub_item['level'] = 3
-                            for sub_sub_sub_item in sub_sub_item['content']:
-                                if sub_sub_sub_item.get('content'):
-                                    sub_sub_sub_item['level'] = np.nan
-                                else:
-                                    sub_sub_sub_item['level'] = 3
-                        else:
-                            sub_sub_item['level'] = 2
+                        if isinstance(sub_sub_item,dict):
+                            if sub_sub_item.get('content'):
+                                sub_sub_item['level'] = 3
+                                for sub_sub_sub_item in sub_sub_item['content']:
+                                    if isinstance(sub_sub_sub_item, dict):
+                                        if sub_sub_sub_item.get('content'):
+                                            sub_sub_sub_item['level'] = np.nan
+                                        else:
+                                            sub_sub_sub_item['level'] = 3
+                            else:
+                                sub_sub_item['level'] = 2
                 else:
                     sub_item['level'] = 1
     return content
@@ -61,25 +63,27 @@ def _set_section_levels(content):
 def _format_content(content, content_key):
     list_content = []
     not_list_content = []
+    if isinstance(content[content_key],dict):
+        for key, val in content[content_key].items():
+            if isinstance(val, list):
+                list_content.append(key)
+            else:
+                not_list_content.append(key)
 
-    for key, val in content[content_key].items():
-        if isinstance(val, list):
-            list_content.append(key)
+
+        if len(list_content) > 0:
+            new_content = []
+            for i in range(len(content[content_key][list_content[0]])):  # assume that all lists have same lengths
+                new_dict = {}
+                for key in list_content:
+                    new_dict[key] = content[content_key][key][i]
+                for key in not_list_content:
+                    new_dict[key] = content[content_key][key]
+                new_content.append(new_dict)
+            content[content_key] = new_content
         else:
-            not_list_content.append(key)
+            content[content_key] = [content[content_key]]
 
-    if len(list_content) > 0:
-        new_content = []
-        for i in range(len(content[content_key][list_content[0]])):  # assume that all lists have same lengths
-            new_dict = {}
-            for key in list_content:
-                new_dict[key] = content[content_key][key][i]
-            for key in not_list_content:
-                new_dict[key] = content[content_key][key]
-            new_content.append(new_dict)
-        content[content_key] = new_content
-    else:
-        content[content_key] = [content[content_key]]
 
 
 def _format_document_dict(content):
@@ -203,7 +207,15 @@ def _append2latexdoc(doc, content):
             if isinstance(content['text'], dict):
                 section.append(open(content['text']['filename']).read())
             else:
-                section.append(content['text'])
+                temp = ''
+                if isinstance(content['text'],list):
+                    for subtext in content['text']:
+                        temp += subtext
+                elif isinstance(content['text'],str):
+                    temp = content['text']
+                else:
+                    raise Exception(f'Did not understand format of text string: \n {content["text"]}')
+                section.append(temp)
         if content.get('latex_code'):
             if isinstance(content['latex_code'], dict):
                 section.append(NoEscape(open(content['latex_code']['filename']).read()))
@@ -212,12 +224,14 @@ def _append2latexdoc(doc, content):
         if content.get('table'):
             for table in content['table']:
                 section.append(NoEscape('\\begin{table}[H]'))  # note require float latex package for H command
-                section.append(NoEscape(pd.read_excel(table['filename'],
-                                                      **table['kwargs']).to_latex(longtable=True,
-                                                                                  multicolumn_format='c')))
+                if table.get('filename'):
+                    df = pd.read_excel(table['filename'], **table['kwargs'])
+                elif isinstance(table.get('dataframe'),pd.DataFrame):
+                    df = table.get('dataframe')
+                section.append(NoEscape(df.to_latex(longtable=True,multicolumn_format='c')))
                 section.append(NoEscape('\\end{table}'))
         if content.get('image'):
-            for image in content['image']:
+            for image in content.get('image'):
                 section.append(NoEscape('\\begin{figure}[H]'))  # note require float latex package for H command
                 Figure.add_image(section, image['filename'])
                 section.append(NoEscape('\\end{figure}'))
@@ -269,7 +283,10 @@ def _append2worddoc(doc, content):
     #             section.append(NoEscape(content['latex_code']))
         if content.get('table'):
             for table in content['table']:
-                df = pd.read_excel(table['filename'], **table['kwargs'])
+                if table.get('filename'):
+                    df = pd.read_excel(table['filename'], **table['kwargs'])
+                elif isinstance(table.get('dataframe'),pd.DataFrame):
+                    df = table.get('dataframe')
 
                 # add a table to the end and create a reference variable
                 # extra row is so we can add the header row
@@ -300,26 +317,9 @@ def _append2worddoc(doc, content):
                 # TODO : Add caption (from here? : https://github.com/python-openxml/python-docx/issues/359 )
         if content.get('subimage'):
             print('The subfigure feature is not yet supported by the word compilator, figure is ignored')
-    #         figure = Figure(position='H')
-    #         for i, subimage in enumerate(content['subimage']):
-    #             subfigure = SubFigure(width=NoEscape(
-    #                 r'{}\linewidth'.format(np.round(1. / subimage.get('nr_horizontal_subimages', 2), 2) - 0.01)))
-    #             subfigure.add_image(subimage['filename'])
-    #             if subimage.get('caption', False):
-    #                 subfigure.add_caption(subimage['caption'])
-    #             if subimage.get('figure_caption', False) and i == 0:
-    #                 figure.add_caption(subimage['figure_caption'])
-    #             figure.append(subfigure)
-    #             if (i + 1) % subimage.get('nr_horizontal_subimages', 2) == 0 and i != 0 or subimage.get(
-    #                     'nr_horizontal_subimages', 2) == 1:
-    #                 section.append(figure)
-    #                 figure = Figure(arguments=NoEscape('\ContinuedFloat'), position='H')
-    #         section.append(figure)
-    #     if content.get('packages'):
-    #         [doc.packages.append(Package(package)) for package in content['packages']]
 
 
-# TODO : Endre navn til make_latex_document
+
 def make_latex_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
     doc = get_document(document_title, **doc_template_kwargs)

@@ -44,14 +44,12 @@
                     "title": "Plots",
                     "content": [
                         {
-                            "image": {
-                                "filename": [
-                                    "files/plot_0.png",
-                                    "files/plot_1.png",
-                                    "files/plot_2.png",
-                                    "files/plot_3.png"
-                                ]
-                            }
+                            "image": [
+                                {"filename": "files/plot_0.png"},
+                                {"filename": "files/plot_1.png"},
+                                {"filename": "files/plot_2.png"},
+                                {"filename": "files/plot_3.png"}
+                            ]
                         }
                     ]
                 },

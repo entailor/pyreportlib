@@ -8,9 +8,6 @@ Created on Fri May 29 11:36:08 2020
 from pyreportlib import make_word_document
 
 
-
-
-
 files = {
     'plots': [f'files/plot_{i}.png' for i in range(4)],
     'excel_file': [f'files/spreadsheet{i}.xlsx' for i in range(2)],

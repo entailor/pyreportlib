@@ -33,7 +33,11 @@ make_document_dict = {
                            'kwargs': {'sheet_name': 'table_2',
                                       'index_col': 0}
                            }},
-                {'title': 'Plots', 'content': [{'image': {'filename': files['plots']}}]
+                {'title': 'Plots with file list', 'content': [{'image': {'filename': files['plots']}}]
+                 },
+                {'title': 'Plot in list', 'content': [{'image': {'filename': files['plots'][0]}}]
+                 },
+                {'title': 'Plot NOT in list', 'content': {'image': {'filename': files['plots'][0]}}
                  },
                 {'text': 'Then, a plot summarizing the results and some remarks'},
                 {'title': 'Subsection with fancy latex code', 'content': [
