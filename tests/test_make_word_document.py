@@ -13,7 +13,8 @@ files = {
     'excel_file': [f'files/spreadsheet{i}.xlsx' for i in range(2)],
     'latex_code_file': 'files/some_random_latex_code.txt',
     'text_file': 'files/some_random_text.txt',
-    'image': 'files/random_shit.jpg'
+    'image': 'files/random_shit.jpg',
+    'word_template' : 'files/template.docx'
 }
 
 make_document_dict = {
@@ -23,6 +24,8 @@ make_document_dict = {
         'fig_ext': u'.pdf',
         'header_logofilename': 'entail.pdf',
         'logo_image_option_header': "width=250px",
+        'document_template' : files['word_template'],
+        'workflow_ID' : 1234,
         'content': [
             {'title': 'Summary', 'content': [
                 {'text': 'Summary, conclusion and stuff \n and here is a new line'}]},

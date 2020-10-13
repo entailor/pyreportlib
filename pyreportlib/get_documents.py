@@ -11,6 +11,7 @@ from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
 from pylatex.utils import bold, NoEscape
 from pylatex.base_classes import CommandBase, Arguments
 import os
+import datetime
 
 _fig_ext = u'.pdf'
 
@@ -22,7 +23,7 @@ class HyperrefCommand(CommandBase):
 
 def get_document(document_title='Report', author='Entail AS', fig_ext=u'.pdf',
                  header_logofilename='entail.pdf',
-                 logo_image_option_header="width=250px"):
+                 logo_image_option_header="width=250px", workflow_ID = 0):
     global _fig_ext
     _fig_ext = fig_ext
 
@@ -88,6 +89,23 @@ def get_document(document_title='Report', author='Entail AS', fig_ext=u'.pdf',
                 packages=[Package('hyperref')]))
     doc.preamble.append(NoEscape(r'\counterwithin{figure}{section}'))
     doc.append(NoEscape(r'\maketitle'))
+
+    # Add disclaimer
+    doc.append(NewPage())
+    doc.append(NoEscape(r'\textbf{Disclaimer}'))
+    doc.append(NoEscape(r'\newline'))
+    doc.append(NoEscape(r'\vspace{0.2in}'))
+
+    temptext = f'This is in automatically generated report. '
+    if workflow_ID == 0:
+        temptext += f'The report was generated '
+    else:
+        temptext += f'The results are extracted from Workflow ID {workflow_ID} '
+    temptext += f'on the {datetime.datetime.now().strftime("%m/%d/%Y at %H:%M:%S")}. '
+    temptext += f'Errors may occur and it is the user’s responsibility to interpret the reported data '
+    temptext += f'with sound engineering judgement.'
+    doc.append(temptext)
+
     doc.append(NewPage())
     doc.append(Command('tableofcontents'))
     doc.append(NewPage())

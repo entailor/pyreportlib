@@ -322,6 +322,9 @@ def _append2worddoc(doc, content):
 
 def make_latex_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
+    if doc_template_kwargs.get('workflow_ID'):
+        wf_id = doc_template_kwargs.get('workflow_ID')
+
     doc = get_document(document_title, **doc_template_kwargs)
     content = _set_section_levels(content)
     content = _format_document_dict(content)
@@ -334,15 +337,25 @@ def make_latex_document(document_title='Document title', document_filename='defa
 
 def make_word_document(document_title='Document title', document_filename='default_filename', content=[],
                   **doc_template_kwargs):
-    doc = Document()
+
+    if doc_template_kwargs.get('document_template'):
+        doc = Document(doc_template_kwargs.get('document_template'))
+    else:
+        doc = Document()
+
     doc.core_properties.title = document_title
     # doc.core_properties.project = 'Tailor report'
-    #
-    # doc.core_properties.Version = 'TestVersion 1.0'
-    #
-    # doc.core_properties.documentnumber = '123456-EN-AA'
-    # doc.core_properties.created = datetime.datetime.now().date()
-    # doc.core_properties.wf_name = 'WF ID NAME'
+
+
+    if doc_template_kwargs.get('workflow_ID'):
+        wf_id = doc_template_kwargs.get('workflow_ID')
+        for paragraph in doc.paragraphs:
+            if 'Disclaimer' in paragraph.text:
+                distext = paragraph.text
+                distext = distext.replace('xxxxxxxx', f'{wf_id}')
+                distext = distext.replace('xx.xx.xxxx', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+                paragraph.text = distext
+
 
 
     # _add_toc_to_docx(doc)
