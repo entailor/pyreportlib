@@ -10,6 +10,7 @@ pyreportlib/template.docx
 pyreportlib.egg-info/PKG-INFO
 pyreportlib.egg-info/SOURCES.txt
 pyreportlib.egg-info/dependency_links.txt
+pyreportlib.egg-info/requires.txt
 pyreportlib.egg-info/top_level.txt
 pyreportlib/utils/__init__.py
 pyreportlib/utils/excel_utils.py

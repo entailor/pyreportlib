@@ -1,8 +1,8 @@
 Metadata-Version: 1.2
 Name: pyreportlib
 Version: 0.1.0
-Summary: UNKNOWN
-Home-page: UNKNOWN
+Summary: pyreportlib is a package for automatic reporting to word and latex
+Home-page: https://github.com/entailor/pyreportlib/
 Author: bernt sørby
 Author-email: bsorby@gmail.com
 License: UNKNOWN

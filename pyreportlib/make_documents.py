@@ -70,7 +70,6 @@ def _format_content(content, content_key):
             else:
                 not_list_content.append(key)
 
-
         if len(list_content) > 0:
             new_content = []
             for i in range(len(content[content_key][list_content[0]])):  # assume that all lists have same lengths
@@ -83,7 +82,6 @@ def _format_content(content, content_key):
             content[content_key] = new_content
         else:
             content[content_key] = [content[content_key]]
-
 
 
 def _format_document_dict(content):
@@ -168,6 +166,7 @@ def _get_last_section(doc):
         if isinstance(stuff, (Section, Subsection, Subsubsection)):
             return stuff
 
+
 def _add_toc_to_docx(doc):
     paragraph = doc.add_paragraph()
     run = paragraph.add_run()
@@ -192,6 +191,7 @@ def _add_toc_to_docx(doc):
     r_element.append(fldChar2)
     r_element.append(fldChar4)
     p_element = paragraph._p
+
 
 def _append2latexdoc(doc, content):
     if isinstance(content, list):
@@ -266,10 +266,6 @@ def _append2worddoc(doc, content):
             else:
                 _append2worddoc(doc, item)
     else:
-        # if len(doc.sections)>0:
-        #     section = doc.sections[-1]
-        #     # TODO : LEter vi egentlgi etter heading her?
-
         if content.get('text'):
             if isinstance(content['text'], dict):
                 doc.add_paragraph(open(content['text']['filename']).read())
@@ -277,10 +273,6 @@ def _append2worddoc(doc, content):
                 doc.add_paragraph(content['text'])
         if content.get('latex_code'):
             print('Latex code not directly supported in word, ignored. ')
-    #         if isinstance(content['latex_code'], dict):
-    #             section.append(NoEscape(open(content['latex_code']['filename']).read()))
-    #         else:
-    #             section.append(NoEscape(content['latex_code']))
         if content.get('table'):
             for table in content['table']:
                 if table.get('filename'):
@@ -291,8 +283,6 @@ def _append2worddoc(doc, content):
                 # add a table to the end and create a reference variable
                 # extra row is so we can add the header row
                 t = doc.add_table(df.shape[0] + 1, df.shape[1])
-                # t = doc.add_table(df.shape[0] + 1, df.shape[1], style='No Spacing')
-                # TODO : Add table style that is more compact
 
                 # add the header rows.
                 for j in range(df.shape[-1]):
@@ -306,18 +296,11 @@ def _append2worddoc(doc, content):
                 r = p.add_run()
                 r.add_break()
 
-    #             section.append(NoEscape('\\begin{table}[H]'))  # note require float latex package for H command
-    #             section.append(NoEscape(pd.read_excel(table['filename'],
-    #                                                   **table['kwargs']).to_latex(longtable=True,
-    #                                                                               multicolumn_format='c')))
-    #             section.append(NoEscape('\\end{table}'))
         if content.get('image'):
             for image in content.get('image'):
                 doc.add_picture(image.get('filename'), width=Cm(12))
-                # TODO : Add caption (from here? : https://github.com/python-openxml/python-docx/issues/359 )
         if content.get('subimage'):
             print('The subfigure feature is not yet supported by the word compilator, figure is ignored')
-
 
 
 def make_latex_document(document_title='Document title', document_filename='default_filename', content=[],
@@ -344,8 +327,6 @@ def make_word_document(document_title='Document title', document_filename='defau
         doc = Document()
 
     doc.core_properties.title = document_title
-    # doc.core_properties.project = 'Tailor report'
-
 
     if doc_template_kwargs.get('workflow_ID'):
         wf_id = doc_template_kwargs.get('workflow_ID')
@@ -356,9 +337,6 @@ def make_word_document(document_title='Document title', document_filename='defau
                 distext = distext.replace('xx.xx.xxxx', datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
                 paragraph.text = distext
 
-
-
-    # _add_toc_to_docx(doc)
     content = _set_section_levels(content)
     content = _format_document_dict(content)
     _append2worddoc(doc, content)

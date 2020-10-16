@@ -1,19 +1,24 @@
 
-**latexreport**
+**pyreportlib**
 ------------
 
 ## Prerequisites
 
-Requires Python 3.7 and pip to be installed. Latexreport also requires pylatex (an open-source Python-library available through pip).
+Requires Python 3.7 and pip to be installed
 
 ## Getting started
 
-The commands below are to be run in the latexreport root dir, i.e. the git repository you've cloned.
+```
+pip install pyreportlib
+```
 
-To install as a Python-library:
+## Contribute
+
+The commands below are to be run in the pyreportlib root dir, i.e. the git repository you've cloned.
+
 
 ```
-pip install -e .
+poetry install
 ```
 
 ## Run tests

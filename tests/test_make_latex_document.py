@@ -22,7 +22,7 @@ make_document_dict = {
         'fig_ext': u'.pdf',
         'header_logofilename': 'entail.pdf',
         'logo_image_option_header': "width=250px",
-        'workflow_ID' : 1234,
+        'workflow_ID': 1234,
         'content': [
             {'title': 'Summary', 'content': [
                 {'text': 'Summary, conclusion and stuff \n and here is a new line'}]},
